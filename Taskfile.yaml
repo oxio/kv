@@ -1,0 +1,13 @@
+version: '3'
+
+tasks:
+
+  default:
+    silent: true
+    cmds:
+      - task -l
+
+  test:
+    desc: "Run tests"
+    cmds:
+      - go test -v ./...

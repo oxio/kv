@@ -1,0 +1,20 @@
+= kv
+
+Super simple file based Key-Value tool build with Golang
+
+Usage:
+
+    kv set /path/to/file.kv mykey myvalue
+
+    kv get /path/to/file.kv mykey
+
+Output:
+
+    myvalue
+
+== Features
+
+- [x] Support for single and double quotes in values
+- [x] Support for simple full-line comments (line must start with `#` character)
+- [x] Concurrent R/W operations
+- [ ] Support for multi-line values
