@@ -1,14 +1,16 @@
 = kv
 
-Super simple file based Key-Value tool that supports concurrent R/W operations. Build with Golang.
+Super simple file based Key-Value tool that works with concurrent R/W operations.
 
-== Installing using go install
+== Installation
+
+=== go install
 
 ----
 go install github.com/oxio/kv@latest
 ----
 
-== Installing using wget
+=== wget
 
 ----
 wget https://github.com/oxio/kv/releases/download/v1.0.0/kv
@@ -18,13 +20,18 @@ mv kv /usr/local/bin/
 
 == Usage
 
-    kv set /path/to/file.kv mykey "myvalue"
+    kv set /path/to/file.kv KEY_ONE value
+    kv set /path/to/file.kv KEY_TWO "value with spaces"
 
-    kv get /path/to/file.kv mykey
+    kv get /path/to/file.kv KEY_ONE
+    kv get /path/to/file.kv KEY_TWO
 
 Output:
 
-    myvalue
+    value⏎
+    value with spaces⏎
+
+NOTE: The keys are case-sensitive.
 
 == Syntax
 
