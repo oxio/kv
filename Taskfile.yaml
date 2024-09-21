@@ -11,3 +11,18 @@ tasks:
     desc: "Run tests"
     cmds:
       - go test -v ./...
+
+  build:
+    desc: "Build binary"
+    cmds:
+      - go build -o build/kv
+
+  build:small:
+    desc: "Build binary"
+    cmds:
+      - go build -ldflags "-w" -o build/kv
+
+  build:smaller:
+    desc: "Build binary"
+    cmds:
+      - go build -ldflags "-s" -o build/kv
