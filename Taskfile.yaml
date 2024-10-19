@@ -1,5 +1,8 @@
 version: '3'
 
+vars:
+  BINARY_NAME: kv
+
 tasks:
 
   default:
@@ -15,14 +18,14 @@ tasks:
   build:
     desc: "Build binary"
     cmds:
-      - go build -o build/kv
+      - go build -o build/{{.BINARY_NAME}}
 
   build:small:
-    desc: "Build binary"
+    desc: "Build small binary"
     cmds:
-      - go build -ldflags "-w" -o build/kv
+      - go build -ldflags "-w" -o build/{{.BINARY_NAME}}
 
   build:smaller:
-    desc: "Build binary"
+    desc: "Build smaller binary"
     cmds:
-      - go build -ldflags "-s" -o build/kv
+      - go build -ldflags "-s" -o build/{{.BINARY_NAME}}

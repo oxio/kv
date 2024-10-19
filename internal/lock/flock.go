@@ -99,7 +99,7 @@ func init() {
 		baseLockDir = "/var/lock/kv"
 	}
 
-	err := os.Mkdir(baseLockDir, 0755)
+	err := os.MkdirAll(baseLockDir, 0755)
 	if err != nil && !os.IsExist(err) {
 		panic(err)
 	}
