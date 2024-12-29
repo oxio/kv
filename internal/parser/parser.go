@@ -17,7 +17,9 @@ func (*LineParser) Parse(line string) (*Item, error) {
 
 	item := &Item{}
 
-	if strings.HasPrefix(line, "#") {
+	if line == "" {
+		return &Item{IsEmpty: true}, nil
+	} else if strings.HasPrefix(line, "#") {
 		item.IsComment = true
 		item.Val = strings.TrimSpace(strings.TrimLeft(line, "#"))
 	} else {

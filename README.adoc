@@ -50,4 +50,5 @@ key='value'
 * [*] Support for single and double quotes in values
 * [*] Support for simple full-line comments (line must start with `#` character)
 * [*] Concurrent R/W operations
+* [ ] Reading multiple files with single command
 * [ ] Support for multi-line values

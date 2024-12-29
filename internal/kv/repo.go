@@ -68,6 +68,9 @@ func (r *RepoImpl) Get(key string) (*parser.Item, error) {
 	}
 
 	for _, item := range *collection.Items {
+		if item.IsEmpty || item.IsComment {
+			continue
+		}
 		if item.Key == key {
 			return item, nil
 		}
@@ -100,7 +103,8 @@ func (r *RepoImpl) makeUpdater(collection *parser.ItemCollection, incoming *pars
 	return func() error {
 		for k, item := range *collection.Items {
 			if item.Key == incoming.Key {
-				(*collection.Items)[k] = incoming
+				item.Val = incoming.Val
+				(*collection.Items)[k] = item
 				return nil
 			}
 		}
