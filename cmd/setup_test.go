@@ -60,7 +60,7 @@ func assertFileContentEquals(t *testing.T, filePath string, expectedContent stri
 		t.Fatalf("Error reading file: %v", err)
 	}
 
-	assert.Equal(t, expectedContent, strings.TrimSpace(*content))
+	assert.Equal(t, expectedContent, *content)
 }
 
 func assertFileContentContains(t *testing.T, filePath string, expectedContent string) {

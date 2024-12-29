@@ -10,7 +10,9 @@ import (
 func TestGetValue_Success(t *testing.T) {
 	content := `key1=value1
 key2="value2"
+
 # This is a comment
+
 key3='value3'
 `
 	tmpFile, err := createRandomTestFileWithContent(content)

@@ -20,7 +20,7 @@ func TestSetValue_Success(t *testing.T) {
 	}
 	assert.NoError(t, err)
 
-	assertFileContentEquals(t, filePath, "key2=value2")
+	assertFileContentEquals(t, filePath, "key2=value2\n")
 }
 
 func TestOverrideValue_Success(t *testing.T) {
@@ -36,12 +36,46 @@ func TestOverrideValue_Success(t *testing.T) {
 	err := cmd1.Execute()
 	assert.NoError(t, err)
 
-	assertFileContentEquals(t, filePath, "key=first value")
+	assertFileContentEquals(t, filePath, "key=first value\n")
 
 	err = cmd2.Execute()
 	assert.NoError(t, err)
 
-	assertFileContentEquals(t, filePath, "key=second value")
+	assertFileContentEquals(t, filePath, "key=second value\n")
+}
+
+func TestExistingFileWithEmptyLinesAndComments(t *testing.T) {
+	initialContent := `key1=value1
+
+# Comment within empty lines
+
+key3='value3'
+
+`
+
+	expectedContentAfterUpdate := `key1=value1
+
+# Comment within empty lines
+
+key3='value333333'
+
+`
+
+	testFile, err := createRandomTestFileWithContent(initialContent)
+	if err == nil {
+		defer removeTestFile(testFile.Name())
+	}
+
+	if err != nil {
+		t.Fatalf("Error setting up test file: %v", err)
+	}
+
+	cmd, _, _ := setUpTestSetCmd()
+	cmd.SetArgs([]string{testFile.Name(), "key3", "value333333"})
+	err = cmd.Execute()
+	assert.NoError(t, err)
+
+	assertFileContentEquals(t, testFile.Name(), expectedContentAfterUpdate)
 }
 
 func TestMultipleConcurrentWrites_Success(t *testing.T) {

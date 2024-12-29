@@ -3,9 +3,10 @@ package parser
 import "fmt"
 
 type Item struct {
+	IsEmpty   bool
+	IsComment bool
 	Key       string
 	Val       string
-	IsComment bool
 	Quote     string
 }
 
@@ -34,9 +35,11 @@ func (ic *ItemCollection) Add(item *Item) {
 }
 
 func (i *Item) ToLine() string {
+	if i.IsEmpty {
+		return "\n"
+	}
 	if i.IsComment {
 		return fmt.Sprintf("# %s\n", i.Val)
-	} else {
-		return fmt.Sprintf("%s=%s%s%s\n", i.Key, i.Quote, i.Val, i.Quote)
 	}
+	return fmt.Sprintf("%s=%s%s%s\n", i.Key, i.Quote, i.Val, i.Quote)
 }
