@@ -1,10 +1,10 @@
-package kv
+package kvf
 
 import (
 	"bufio"
 	"fmt"
-	"github.com/oxio/kv/internal/fileop"
-	"github.com/oxio/kv/internal/parser"
+	"github.com/oxio/kvf/internal/fileop"
+	"github.com/oxio/kvf/internal/parser"
 )
 
 type Repo interface {
@@ -20,7 +20,7 @@ type RepoImpl struct {
 	parser  *parser.LineParser
 }
 
-func NewKvRepo(filePath string, noErrorOnInaccessibleFile bool) *RepoImpl {
+func NewRepo(filePath string, noErrorOnInaccessibleFile bool) *RepoImpl {
 	return &RepoImpl{
 		adapter: fileop.NewFileAdapter(filePath, noErrorOnInaccessibleFile),
 		parser:  parser.NewLineParser(),

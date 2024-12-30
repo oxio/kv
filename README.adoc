@@ -1,30 +1,30 @@
-= kv
+= kvf - Key Value File CLI tool
 
-Super simple file based Key-Value tool that works with concurrent R/W operations.
+Super simple file based Key-Value command line tool that works with concurrent R/W operations.
 
 == Installation
 
 === go install
 
 ----
-go install github.com/oxio/kv@latest
+go install github.com/oxio/kvf@latest
 ----
 
 === wget
 
 ----
-wget https://github.com/oxio/kv/releases/latest/download/kv
-chmod +x kv
-mv kv /usr/local/bin/
+wget https://github.com/oxio/kvf/releases/latest/download/kvf
+chmod +x kvf
+mv kvf /usr/local/bin/
 ----
 
 == Usage
 
-    kv set /path/to/file.kv KEY_ONE value
-    kv set /path/to/file.kv KEY_TWO "value with spaces"
+    kvf set /path/to/file.kv KEY_ONE value
+    kvf set /path/to/file.kv KEY_TWO "value with spaces"
 
-    kv get /path/to/file.kv KEY_ONE
-    kv get /path/to/file.kv KEY_TWO
+    kvf get /path/to/file.kv KEY_ONE
+    kvf get /path/to/file.kv KEY_TWO
 
 Output:
 
@@ -50,5 +50,5 @@ key='value'
 * [*] Support for single and double quotes in values
 * [*] Support for simple full-line comments (line must start with `#` character)
 * [*] Concurrent R/W operations
-* [ ] Reading multiple files with single command
+* [*] Reading multiple files with single command
 * [ ] Support for multi-line values

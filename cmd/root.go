@@ -5,7 +5,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "kv",
+	Use:   "kvf",
 	Short: "Simple Key-Value storage tool",
 }
 
