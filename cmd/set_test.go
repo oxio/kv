@@ -78,6 +78,23 @@ key3='value333333'
 	assertFileContentEquals(t, testFile.Name(), expectedContentAfterUpdate)
 }
 
+func TestSetMultipleFiles_Success(t *testing.T) {
+	filePath1 := getRandomTestFilePath()
+	filePath2 := getRandomTestFilePath()
+	cmd, _, _ := setUpTestSetCmd()
+	cmd.SetArgs([]string{filePath1, filePath2, "foo", "bar"})
+
+	err := cmd.Execute()
+	if err == nil {
+		defer removeTestFile(filePath1)
+		defer removeTestFile(filePath2)
+	}
+	assert.NoError(t, err)
+
+	assertFileContentEquals(t, filePath1, "foo=bar\n")
+	assertFileContentEquals(t, filePath2, "foo=bar\n")
+}
+
 func TestMultipleConcurrentWrites_Success(t *testing.T) {
 	filePath := getRandomTestFilePath()
 	defer removeTestFile(filePath)
@@ -104,6 +121,22 @@ func TestMultipleConcurrentWrites_Success(t *testing.T) {
 		expected := "key" + commandId + "=value" + commandId
 		assertFileContentContains(t, filePath, expected)
 	}
+}
+
+func TestMultipleSetsOfTheSameKeyCausingNewLinesToBeAdded_Regression(t *testing.T) {
+	testFile, err := createRandomTestFileWithContent("key=\"foo\"\n")
+	assert.NoError(t, err)
+	defer removeTestFile(testFile.Name())
+
+	for i := 0; i <= 3; i++ {
+		cmd, _, _ := setUpTestSetCmd()
+		cmd.SetArgs([]string{testFile.Name(), "key", "value with spaces " + strconv.Itoa(i)})
+
+		err = cmd.Execute()
+		assert.NoError(t, err)
+	}
+
+	assertFileContentEquals(t, testFile.Name(), "key=\"value with spaces 3\"\n")
 }
 
 func setUpTestSetCmd() (*cobra.Command, *bytes.Buffer, *bytes.Buffer) {

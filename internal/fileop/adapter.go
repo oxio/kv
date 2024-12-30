@@ -22,18 +22,25 @@ type UpdateFunc func() error
 type WriterFunc func(writer *bufio.Writer) error
 
 type DefaultAdapter struct {
-	filePath string
+	filePath                string
+	noErrOnInaccessibleFile bool
 }
 
 var _ FileAdapter = &DefaultAdapter{}
 
-func NewFileAdapter(filePath string) *DefaultAdapter {
-	return &DefaultAdapter{filePath: filePath}
+func NewFileAdapter(filePath string, noErrOnInaccessibleFile bool) *DefaultAdapter {
+	return &DefaultAdapter{
+		filePath:                filePath,
+		noErrOnInaccessibleFile: noErrOnInaccessibleFile,
+	}
 }
 
 func (adapter *DefaultAdapter) ReadByLine(lineCallback ReaderFunc) error {
 	fp, err := os.Open(adapter.filePath)
 	if err != nil {
+		if adapter.noErrOnInaccessibleFile && (os.IsNotExist(err) || os.IsPermission(err)) {
+			return nil
+		}
 		return err
 	}
 	defer func(file *os.File) {
@@ -130,9 +137,6 @@ func (adapter *DefaultAdapter) EnsureUpdate(
 	}
 
 	err = writeCallback(writer)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }

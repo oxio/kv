@@ -99,6 +99,64 @@ key3='value3'
 	}
 }
 
+func TestMissingFile(t *testing.T) {
+	cmd := newGetCmd()
+	outBuff := bytes.NewBufferString("")
+	errBuff := bytes.NewBufferString("")
+	cmd.SetOut(outBuff)
+	cmd.SetErr(errBuff)
+
+	cmd.SetArgs([]string{"non-existing-file", "key"})
+	err := cmd.Execute()
+	assert.Error(t, err)
+	errContent, err := io.ReadAll(errBuff)
+	assert.NoError(t, err)
+	assert.Contains(t, string(errContent), "Error: open non-existing-file: no such file or directory")
+}
+
+func TestMissingFile_WithSkipMissingFileFlag(t *testing.T) {
+	cmd := newGetCmd()
+	outBuff := bytes.NewBufferString("")
+	errBuff := bytes.NewBufferString("")
+	cmd.SetOut(outBuff)
+	cmd.SetErr(errBuff)
+
+	cmd.SetArgs([]string{"non-existing-file", "key", "-m"})
+	err := cmd.Execute()
+	assert.Error(t, err)
+	errContent, err := io.ReadAll(errBuff)
+	assert.NoError(t, err)
+	assert.Contains(t, string(errContent), "Error: key doesn't exist")
+}
+
+func TestReadMultipleFiles(t *testing.T) {
+	content1 := `key=value1`
+	content2 := `key=value2`
+
+	tmpFile1, err := createRandomTestFileWithContent(content1)
+	if err == nil {
+		defer removeTestFile(tmpFile1.Name())
+	}
+
+	tmpFile2, err := createRandomTestFileWithContent(content2)
+	if err == nil {
+		defer removeTestFile(tmpFile2.Name())
+	}
+
+	cmd := newGetCmd()
+	outBuff := bytes.NewBufferString("")
+	errBuff := bytes.NewBufferString("")
+	cmd.SetOut(outBuff)
+	cmd.SetErr(errBuff)
+
+	cmd.SetArgs([]string{tmpFile1.Name(), tmpFile2.Name(), "key"})
+	err = cmd.Execute()
+	assert.NoError(t, err)
+	outContent, err := io.ReadAll(outBuff)
+	assert.NoError(t, err)
+	assert.Equal(t, "value2", string(outContent))
+}
+
 func TestGetValue_InvalidFileFormat(t *testing.T) {
 	content := `key1=value1
 key2
@@ -125,4 +183,19 @@ key3='value3'
 	assert.Error(t, err)
 	errContent, err := io.ReadAll(errBuff)
 	assert.Contains(t, string(errContent), "invalid line: key2")
+}
+
+func TestNotEnoughArguments(t *testing.T) {
+	cmd := newGetCmd()
+	outBuff := bytes.NewBufferString("")
+	errBuff := bytes.NewBufferString("")
+	cmd.SetOut(outBuff)
+	cmd.SetErr(errBuff)
+
+	cmd.SetArgs([]string{"arg1"})
+	err := cmd.Execute()
+	assert.Error(t, err)
+	errContent, err := io.ReadAll(errBuff)
+	assert.NoError(t, err)
+	assert.Contains(t, string(errContent), "Error: not enough arguments")
 }

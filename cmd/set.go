@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/oxio/kv/internal/kv"
 	"github.com/oxio/kv/internal/parser"
 	"github.com/spf13/cobra"
@@ -8,21 +9,32 @@ import (
 
 func newSetCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "set <file> <key> <value>",
+		Use:   "set <file1> [<file2> <file3> ...] <key> <value>",
 		Short: "Sets a value to a key-value file",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			file := args[0]
-			key := args[1]
-			value := args[2]
-
-			repo := kv.NewKvRepo(file)
-			item, err := parser.NewItem(key, value)
-			if err != nil {
-				return err
+			if len(args) < 3 {
+				return fmt.Errorf("not enough arguments")
 			}
 
-			return repo.Set(item)
+			files := args[:len(args)-2]
+			key := args[len(args)-2]
+			value := args[len(args)-1]
+
+			for _, file := range files {
+				repo := kv.NewKvRepo(file, false)
+				item, err := parser.NewItem(key, value)
+				if err != nil {
+					return err
+				}
+
+				err = repo.Set(item)
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
 		},
 	}
 }

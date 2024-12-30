@@ -13,7 +13,7 @@ go install github.com/oxio/kv@latest
 === wget
 
 ----
-wget https://github.com/oxio/kv/releases/download/v1.0.0/kv
+wget https://github.com/oxio/kv/releases/latest/download/kv
 chmod +x kv
 mv kv /usr/local/bin/
 ----
