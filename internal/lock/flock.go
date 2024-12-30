@@ -94,9 +94,9 @@ func retryWithBackoff(
 
 func init() {
 	if runtime.GOOS == "windows" {
-		baseLockDir = filepath.Join(os.TempDir(), "kv-locks")
+		baseLockDir = filepath.Join(os.TempDir(), "kvf-locks")
 	} else {
-		baseLockDir = "/var/lock/kv"
+		baseLockDir = "/var/lock/kvf"
 	}
 
 	err := os.MkdirAll(baseLockDir, 0755)

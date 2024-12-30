@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	testDir = "kv-test-dir"
+	testDir = "kvf-test-dir"
 )
 
 func getTestFileDir() string {
@@ -27,7 +27,7 @@ func getTestFileDir() string {
 func getRandomTestFilePath() string {
 	for {
 		num := uint64(rand.Int63()) + uint64(1_000_000_000)
-		path := filepath.Join(getTestFileDir(), fmt.Sprintf("kv-test-file-%x.kv", num))
+		path := filepath.Join(getTestFileDir(), fmt.Sprintf("kvf-test-file-%x.kvf", num))
 		_, err := os.Stat(path)
 		if err != nil && os.IsNotExist(err) {
 			return path
@@ -36,7 +36,7 @@ func getRandomTestFilePath() string {
 }
 
 func createRandomTestFileWithContent(content string) (*os.File, error) {
-	tmpFile, err := os.CreateTemp(getTestFileDir(), "kv-testfile-*.kv")
+	tmpFile, err := os.CreateTemp(getTestFileDir(), "kvf-testfile-*.kvf")
 	if err != nil {
 		return nil, err
 	}

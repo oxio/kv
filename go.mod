@@ -1,4 +1,4 @@
-module github.com/oxio/kv
+module github.com/oxio/kvf
 
 go 1.22.0
 

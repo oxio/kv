@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/oxio/kv/internal/kv"
-	"github.com/oxio/kv/internal/parser"
+	"github.com/oxio/kvf/internal/kvf"
+	"github.com/oxio/kvf/internal/parser"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +26,7 @@ func newGetCmd() *cobra.Command {
 			key := args[len(args)-1]
 
 			for _, file := range files {
-				repo := kv.NewKvRepo(file, *skipMissingFiles)
+				repo := kvf.NewRepo(file, *skipMissingFiles)
 
 				if cmd.Flag(defaultValFlag).Changed {
 					item, err = repo.Find(key, defaultVal)
