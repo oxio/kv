@@ -20,9 +20,9 @@ type RepoImpl struct {
 	parser  *parser.LineParser
 }
 
-func NewKvRepo(filePath string) *RepoImpl {
+func NewKvRepo(filePath string, noErrorOnInaccessibleFile bool) *RepoImpl {
 	return &RepoImpl{
-		adapter: fileop.NewFileAdapter(filePath),
+		adapter: fileop.NewFileAdapter(filePath, noErrorOnInaccessibleFile),
 		parser:  parser.NewLineParser(),
 	}
 }
@@ -101,14 +101,18 @@ func (r *RepoImpl) makeReader(collection *parser.ItemCollection) fileop.ReaderFu
 
 func (r *RepoImpl) makeUpdater(collection *parser.ItemCollection, incoming *parser.Item) fileop.UpdateFunc {
 	return func() error {
+		found := false
 		for k, item := range *collection.Items {
 			if item.Key == incoming.Key {
 				item.Val = incoming.Val
 				(*collection.Items)[k] = item
-				return nil
+				found = true
+				break
 			}
 		}
-		*collection.Items = append(*collection.Items, incoming)
+		if !found {
+			*collection.Items = append(*collection.Items, incoming)
+		}
 		return nil
 	}
 }
