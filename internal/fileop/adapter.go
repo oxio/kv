@@ -19,7 +19,7 @@ type FileAdapter interface {
 
 type ReaderFunc func(line string) error
 type UpdateFunc func() error
-type WriterFunc func(writer *bufio.Writer) error
+type WriterFunc func(writer *bufio.Writer) (bytesWritten int64, err error)
 
 type DefaultAdapter struct {
 	filePath                string
@@ -136,7 +136,11 @@ func (adapter *DefaultAdapter) EnsureUpdate(
 		return err
 	}
 
-	err = writeCallback(writer)
+	bytesWritten, err := writeCallback(writer)
+	if err != nil {
+		return err
+	}
+	err = fp.Truncate(bytesWritten)
 
 	return err
 }

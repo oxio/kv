@@ -49,7 +49,7 @@ func TestExistingFileWithEmptyLinesAndComments(t *testing.T) {
 
 # Comment within empty lines
 
-key3='value3'
+key2='value2'
 
 `
 
@@ -57,7 +57,7 @@ key3='value3'
 
 # Comment within empty lines
 
-key3='value333333'
+key2='value333'
 
 `
 
@@ -71,7 +71,7 @@ key3='value333333'
 	}
 
 	cmd, _, _ := setUpTestSetCmd()
-	cmd.SetArgs([]string{testFile.Name(), "key3", "value333333"})
+	cmd.SetArgs([]string{testFile.Name(), "key2", "value333"})
 	err = cmd.Execute()
 	assert.NoError(t, err)
 
@@ -137,6 +137,75 @@ func TestMultipleSetsOfTheSameKeyCausingNewLinesToBeAdded_Regression(t *testing.
 	}
 
 	assertFileContentEquals(t, testFile.Name(), "key=\"value with spaces 3\"\n")
+}
+
+func TestMultipleSetsOfTheSameKeyCausingFileBeingCorrupted_Regression(t *testing.T) {
+	testFile, err := createRandomTestFileWithContent("key=\"foo bar\"\n")
+	assert.NoError(t, err)
+	defer removeTestFile(testFile.Name())
+
+	cmd, _, _ := setUpTestSetCmd()
+	cmd.SetArgs([]string{testFile.Name(), "key", "foo"})
+
+	err = cmd.Execute()
+	assert.NoError(t, err)
+
+	assertFileContentEquals(t, testFile.Name(), "key=\"foo\"\n")
+}
+
+func TestPreserveNewLinesCount(t *testing.T) {
+	testCases := []struct {
+		name            string
+		originalContent string
+		key             string
+		newValue        string
+		expectedContent string
+	}{
+		{
+			name:            "single starting line line - will always add empty line at end",
+			originalContent: "key=\"foo bar\"",
+			key:             "key",
+			newValue:        "foo",
+			expectedContent: "key=\"foo\"\n",
+		},
+		{
+			name:            "single line with empty at end",
+			originalContent: "key=\"foo bar\"\n",
+			key:             "key",
+			newValue:        "foo",
+			expectedContent: "key=\"foo\"\n",
+		},
+		{
+			name:            "two empty ending lines",
+			originalContent: "key=\"foo bar\"\n\n",
+			key:             "key",
+			newValue:        "foo",
+			expectedContent: "key=\"foo\"\n\n",
+		},
+		{
+			name:            "three empty ending lines",
+			originalContent: "key=\"foo bar\"\n\n\n",
+			key:             "key",
+			newValue:        "foo",
+			expectedContent: "key=\"foo\"\n\n\n",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testFile, err := createRandomTestFileWithContent(tc.originalContent)
+			assert.NoError(t, err)
+			defer removeTestFile(testFile.Name())
+
+			cmd, _, _ := setUpTestSetCmd()
+			cmd.SetArgs([]string{testFile.Name(), tc.key, tc.newValue})
+
+			err = cmd.Execute()
+			assert.NoError(t, err)
+
+			assertFileContentEquals(t, testFile.Name(), tc.expectedContent)
+		})
+	}
 }
 
 func setUpTestSetCmd() (*cobra.Command, *bytes.Buffer, *bytes.Buffer) {

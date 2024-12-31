@@ -118,13 +118,14 @@ func (r *RepoImpl) makeUpdater(collection *parser.ItemCollection, incoming *pars
 }
 
 func (r *RepoImpl) makeWriter(collection *parser.ItemCollection) fileop.WriterFunc {
-	return func(writer *bufio.Writer) error {
+	return func(writer *bufio.Writer) (bytesWritten int64, err error) {
 		for _, item := range *collection.Items {
-			var _, err = writer.WriteString(item.ToLine())
+			var n, err = writer.WriteString(item.ToLine())
+			bytesWritten += int64(n)
 			if err != nil {
-				return err
+				return bytesWritten, err
 			}
 		}
-		return nil
+		return bytesWritten, nil
 	}
 }

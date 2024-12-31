@@ -5,8 +5,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "kvf",
-	Short: "Simple Key-Value storage tool",
+	Use:     "kvf",
+	Short:   "Simple Key-Value storage tool",
+	Version: "1.2.1",
 }
 
 func Execute() {
