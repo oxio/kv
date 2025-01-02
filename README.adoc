@@ -31,7 +31,7 @@ kvf get /path/to/file.kv KEY_ONE
 kvf get /path/to/file.kv KEY_TWO
 ----
 
-.Output:
+.Output
 ----
 value⏎
 value with spaces⏎
@@ -56,7 +56,7 @@ kvf set .env.local APP_ENV dev
 kvf get .env .env.local APP_ENV
 ----
 
-.Output:
+.Output
 ----
 dev⏎
 ----
@@ -76,7 +76,7 @@ kvf set .env .env.local APP_PORT 8000
 kvf get .env APP_PORT
 ----
 
-.Output:
+.Output
 ----
 8000
 ----
@@ -87,7 +87,7 @@ kvf get .env APP_PORT
 kvf get .env.local APP_PORT
 ----
 
-.Output:
+.Output
 ----
 8000
 ----
