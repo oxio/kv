@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"github.com/oxio/kvf/internal/kvf"
 	"github.com/oxio/kvf/internal/parser"
@@ -15,9 +16,6 @@ func newGetCmd() *cobra.Command {
 		Use:   "get <file1> [<file2> <file3> ...] <key> [--default|-d value] [--skip-missing-files|-m]",
 		Short: "Gets a value from the key-value file",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var item *parser.Item
-			var err error
-
 			if len(args) < 2 {
 				return fmt.Errorf("not enough arguments")
 			}
@@ -25,23 +23,31 @@ func newGetCmd() *cobra.Command {
 			files := args[:len(args)-1]
 			key := args[len(args)-1]
 
+			var foundItem *parser.Item
 			for _, file := range files {
 				repo := kvf.NewRepo(file, *skipMissingFiles)
 
-				if cmd.Flag(defaultValFlag).Changed {
-					item, err = repo.Find(key, defaultVal)
-				} else {
-					item, err = repo.Get(key)
+				currentItem, err := repo.Get(key)
+				if err != nil {
+					if errors.Is(err, kvf.ErrItemNotFound) {
+						continue
+					}
+					return err
 				}
+				foundItem = currentItem
 			}
 
-			if err != nil {
-				return err
+			if foundItem != nil {
+				cmd.Print(foundItem.Val)
+				return nil
 			}
 
-			cmd.Print(item.Val)
+			if cmd.Flag(defaultValFlag).Changed {
+				cmd.Print(*defaultVal)
+				return nil
+			}
 
-			return nil
+			return errors.New("key not found")
 		},
 	}
 

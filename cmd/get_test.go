@@ -53,7 +53,7 @@ key3='value3'
 			name:          "Not found key",
 			key:           "bogus-key",
 			expectedValue: "",
-			expectedError: "key doesn't exist",
+			expectedError: "key not found",
 		},
 		{
 			name:          "Not found key with default",
@@ -126,7 +126,7 @@ func TestMissingFile_WithSkipMissingFileFlag(t *testing.T) {
 	assert.Error(t, err)
 	errContent, err := io.ReadAll(errBuff)
 	assert.NoError(t, err)
-	assert.Contains(t, string(errContent), "Error: key doesn't exist")
+	assert.Contains(t, string(errContent), "Error: key not found")
 }
 
 func TestReadMultipleFiles(t *testing.T) {
@@ -134,14 +134,12 @@ func TestReadMultipleFiles(t *testing.T) {
 	content2 := `key=value2`
 
 	tmpFile1, err := createRandomTestFileWithContent(content1)
-	if err == nil {
-		defer removeTestFile(tmpFile1.Name())
-	}
+	assert.NoError(t, err)
+	defer removeTestFile(tmpFile1.Name())
 
 	tmpFile2, err := createRandomTestFileWithContent(content2)
-	if err == nil {
-		defer removeTestFile(tmpFile2.Name())
-	}
+	assert.NoError(t, err)
+	defer removeTestFile(tmpFile2.Name())
 
 	cmd := newGetCmd()
 	outBuff := bytes.NewBufferString("")
@@ -155,6 +153,32 @@ func TestReadMultipleFiles(t *testing.T) {
 	outContent, err := io.ReadAll(outBuff)
 	assert.NoError(t, err)
 	assert.Equal(t, "value2", string(outContent))
+}
+
+func TestReadMultipleFiles_WithOnlyOneFileContainsKey(t *testing.T) {
+	content1 := "key=value1"
+	content2 := ""
+
+	tmpFile1, err := createRandomTestFileWithContent(content1)
+	assert.NoError(t, err)
+	defer removeTestFile(tmpFile1.Name())
+
+	tmpFile2, err := createRandomTestFileWithContent(content2)
+	assert.NoError(t, err)
+	defer removeTestFile(tmpFile2.Name())
+
+	cmd := newGetCmd()
+	outBuff := bytes.NewBufferString("")
+	errBuff := bytes.NewBufferString("")
+	cmd.SetOut(outBuff)
+	cmd.SetErr(errBuff)
+
+	cmd.SetArgs([]string{tmpFile1.Name(), tmpFile2.Name(), "key"})
+	err = cmd.Execute()
+	assert.NoError(t, err)
+	outContent, err := io.ReadAll(outBuff)
+	assert.NoError(t, err)
+	assert.Equal(t, "value1", string(outContent))
 }
 
 func TestGetValue_InvalidFileFormat(t *testing.T) {
