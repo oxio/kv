@@ -2,18 +2,22 @@ package kvf
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"github.com/oxio/kvf/internal/fileop"
 	"github.com/oxio/kvf/internal/parser"
 )
 
 type Repo interface {
-	Find(key string, defaultValue *string) (*parser.Item, error)
 	Get(key string) (*parser.Item, error)
 	Set(item *parser.Item) error
 }
 
 var _ Repo = &RepoImpl{}
+
+var (
+	ErrItemNotFound = errors.New("item not found")
+)
 
 type RepoImpl struct {
 	adapter fileop.FileAdapter
@@ -25,26 +29,6 @@ func NewRepo(filePath string, noErrorOnInaccessibleFile bool) *RepoImpl {
 		adapter: fileop.NewFileAdapter(filePath, noErrorOnInaccessibleFile),
 		parser:  parser.NewLineParser(),
 	}
-}
-
-func (r *RepoImpl) Find(key string, defaultValue *string) (*parser.Item, error) {
-	if "" == key {
-		return nil, fmt.Errorf("key is empty")
-	}
-
-	var collection = parser.NewItemCollection()
-	err := r.adapter.ReadByLine(r.makeReader(collection))
-	if err != nil {
-		return nil, err
-	}
-
-	for _, item := range *collection.Items {
-		if item.Key == key {
-			return item, nil
-		}
-	}
-
-	return parser.NewItem(key, *defaultValue)
 }
 
 func (r *RepoImpl) FindAll() (*[]*parser.Item, error) {
@@ -76,7 +60,7 @@ func (r *RepoImpl) Get(key string) (*parser.Item, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("key doesn't exist")
+	return nil, ErrItemNotFound
 }
 
 func (r *RepoImpl) Set(item *parser.Item) error {

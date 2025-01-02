@@ -6,12 +6,14 @@ Super simple file based Key-Value command line tool that works with concurrent R
 
 === go install
 
+[source, bash]
 ----
 go install github.com/oxio/kvf@latest
 ----
 
 === wget
 
+[source, bash]
 ----
 wget https://github.com/oxio/kvf/releases/latest/download/kvf
 chmod +x kvf
@@ -20,18 +22,76 @@ mv kvf /usr/local/bin/
 
 == Usage
 
-    kvf set /path/to/file.kv KEY_ONE value
-    kvf set /path/to/file.kv KEY_TWO "value with spaces"
+[source, bash]
+----
+kvf set /path/to/file.kv KEY_ONE value
+kvf set /path/to/file.kv KEY_TWO "value with spaces"
 
-    kvf get /path/to/file.kv KEY_ONE
-    kvf get /path/to/file.kv KEY_TWO
+kvf get /path/to/file.kv KEY_ONE
+kvf get /path/to/file.kv KEY_TWO
+----
 
-Output:
-
-    value⏎
-    value with spaces⏎
+.Output:
+----
+value⏎
+value with spaces⏎
+----
 
 NOTE: The keys are case-sensitive.
+
+=== Getting values from multiple files
+
+The value from last file in which the key is found will be returned.
+
+.Set different values for two files
+[source, bash]
+----
+kvf set .env       APP_ENV prod
+kvf set .env.local APP_ENV dev
+----
+
+.Get the value from first and second file in that order
+[source, bash]
+----
+kvf get .env .env.local APP_ENV
+----
+
+.Output:
+----
+dev⏎
+----
+
+=== Setting values for multiple files
+
+.Set the value for both files
+[source, bash]
+----
+kvf set .env .env.local APP_PORT 8000
+----
+
+
+.Get from first file
+[source, bash]
+----
+kvf get .env APP_PORT
+----
+
+.Output:
+----
+8000
+----
+
+.Get the value from second file
+[source, bash]
+----
+kvf get .env.local APP_PORT
+----
+
+.Output:
+----
+8000
+----
+
 
 == Syntax
 
